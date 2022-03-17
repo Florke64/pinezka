@@ -22,3 +22,15 @@ You can edit the `app.py` and change the variables like the number of shots or w
 ## Video by Uwaga! Naukowy bełkot
 
 [Video by Uwaga! Naukowy bełkot](https://youtu.be/aKyzxK7Wj0o?t=785)
+
+## More
+
+The Pi number (wikipedia): [Link](https://en.wikipedia.org/wiki/Pi)
+
+Monte Carlo Method: [Link](https://www.geeksforgeeks.org/estimating-value-pi-using-monte-carlo/)
+
+## License
+
+This project is licensed under the [MIT](https://mit-license.org/) license.
+
+
