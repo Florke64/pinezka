@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import sys
 import math
+import random
 import pygame
 
 SCALE = 1.314
@@ -12,6 +13,13 @@ WINDOW_RESOLUTION = (W_WIDTH, W_HEIGHT)
 
 TARGET_CENTER = (W_WIDTH/2, W_HEIGHT/2)
 TARGET_SIZE = 400
+
+SHOTS = 0
+SHOTS_IN_RECT = 0
+SHOTS_IN_CIRCLE = 0
+
+global SHOT_POINTS
+SHOT_POINTS = []
 
 
 class Target:
@@ -62,6 +70,45 @@ def draw_checker(window):
         pygame.draw.line(window, line_color, (0, y), (W_WIDTH, y))
 
 
+def draw_shots(window):
+    for shot in SHOT_POINTS:
+        point = shot[0]
+
+        if shot[1] == 2:
+            color = (0, 255, 0)
+        elif shot[1] == 1:
+            color = (0, 0, 255)
+        else:
+            color = (255, 0, 0)
+
+        pygame.draw.circle(window, color, point, 2)
+
+
+def random_shot():
+    rand_point = random.randrange(0, W_WIDTH), random.randrange(0, W_HEIGHT)
+
+    global SHOTS
+    SHOTS += 1
+
+    if TARGET.is_in_circle(rand_point):
+        magic_number = 2
+
+        global SHOTS_IN_CIRCLE
+        SHOTS_IN_CIRCLE += 1
+
+    elif TARGET.is_in_rect(rand_point):
+        magic_number = 1
+
+        global SHOTS_IN_RECT
+        SHOTS_IN_RECT += 1
+
+    else:
+        magic_number = 0
+
+    global SHOT_POINTS
+    SHOT_POINTS.append((rand_point, magic_number))
+
+
 class PiNezka:
     def __init__(self):
         global INSTANCE
@@ -74,6 +121,9 @@ class PiNezka:
         pygame.display.set_caption(WINDOW_TITLE)
 
     def init_app(self):
+        # for i in range(50000):
+        #     random_shot()
+
         pass
 
     def update(self):
@@ -84,6 +134,8 @@ class PiNezka:
 
         # cosmetic aspect of the background
         draw_checker(self._window)
+
+        draw_shots(self._window)
 
         global TARGET
         TARGET.draw(self._window)
@@ -96,8 +148,14 @@ class PiNezka:
                 self._running = False
 
             if event.type == pygame.MOUSEBUTTONUP:
-                pos = pygame.mouse.get_pos()
-                print(TARGET.is_in_circle(pos))
+                # pos = pygame.mouse.get_pos()
+                # random_shot()
+
+                for i in range(5000):
+                    random_shot()
+
+                print(SHOTS, SHOTS_IN_RECT, SHOTS_IN_CIRCLE)
+                print("PI = " + str((SHOTS_IN_CIRCLE / (SHOTS_IN_RECT+SHOTS_IN_CIRCLE)) * 4))
 
     def mainloop(self):
         while self._running:
