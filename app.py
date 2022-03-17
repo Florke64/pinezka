@@ -33,6 +33,12 @@ global SHOT_POINTS
 SHOT_POINTS = []
 
 
+def clear_shots():
+    global SHOT_POINTS, SHOTS, SHOTS_IN_RECT, SHOTS_IN_CIRCLE
+    SHOT_POINTS.clear()
+    SHOTS = SHOTS_IN_RECT = SHOTS_IN_CIRCLE = 0
+
+
 class Target:
     def __init__(self, center):
         self._center = center
@@ -202,8 +208,7 @@ class PiNezka:
                     return
 
                 if event.button == 3:
-                    global SHOT_POINTS
-                    SHOT_POINTS.clear()
+                    clear_shots()
 
                 for i in range(BATCH_SHOTS):
                     random_shot()
