@@ -5,18 +5,29 @@ import random
 import pygame
 
 SCALE = 1.314
-W_WIDTH = 1280
-W_HEIGHT = 720
+W_WIDTH = 800
+W_HEIGHT = 600
 FPS_COUNT = 24
 WINDOW_TITLE = "PiNezka | Author: Wasiak Florke Daniel <wasiak.daniel@gmail.com>"
 WINDOW_RESOLUTION = (W_WIDTH, W_HEIGHT)
 
-TARGET_CENTER = (W_WIDTH/2, W_HEIGHT/2)
-TARGET_SIZE = 400
+TARGET_CENTER = (int(W_WIDTH/2), int(W_HEIGHT/2))
+TARGET_SIZE = int(W_HEIGHT - (0.314 * W_HEIGHT))
+
+BATCH_SHOTS = 218
 
 SHOTS = 0
 SHOTS_IN_RECT = 0
 SHOTS_IN_CIRCLE = 0
+
+global CALCULATED_PI
+CALCULATED_PI = math.pi
+
+
+def update_pi():
+    global CALCULATED_PI
+    CALCULATED_PI = (SHOTS_IN_CIRCLE / (SHOTS_IN_RECT+SHOTS_IN_CIRCLE)) * 4
+
 
 global SHOT_POINTS
 SHOT_POINTS = []
@@ -25,18 +36,18 @@ SHOT_POINTS = []
 class Target:
     def __init__(self, center):
         self._center = center
-        self._point = center[0]-TARGET_SIZE/2, center[1]-TARGET_SIZE/2
+        self._point = int(center[0]-TARGET_SIZE/2), int(center[1]-TARGET_SIZE/2)
         self._width = TARGET_SIZE
 
     def draw(self, window):
         line_color = (200, 200, 200)
 
-        pygame.draw.rect(window, line_color, (self._point[0], self._point[1], self._width, self._width), 2)
-        pygame.draw.circle(window, line_color, self._center, self._width/2, 2)
+        pygame.draw.rect(window, line_color, (self._point[0], self._point[1], self._width, self._width), 1)
+        pygame.draw.circle(window, line_color, self._center, self._width/2, 1)
 
     def is_in_rect(self, point):
-        return (self._point[0] < point[0] < self._point[0] + self._width) and \
-               (self._point[1] < point[1] < self._point[1] + self._width)
+        return (self._point[0] <= point[0] <= self._point[0] + self._width) and \
+               (self._point[1] <= point[1] <= self._point[1] + self._width)
 
     def is_in_circle(self, point):
         if not self.is_in_rect(point):
@@ -44,10 +55,18 @@ class Target:
 
         a = math.pow(self._center[0] - point[0], 2)
         b = math.pow(self._center[1] - point[1], 2)
-        if math.sqrt(a + b) < self._width/2:
+        if math.sqrt(a + b) <= self._width/2:
             return True
 
         return False
+
+    @property
+    def point(self):
+        return self._point
+
+    @property
+    def width(self):
+        return self._width
 
 
 global TARGET
@@ -81,11 +100,36 @@ def draw_shots(window):
         else:
             color = (255, 0, 0)
 
-        pygame.draw.circle(window, color, point, 2)
+        pygame.draw.circle(window, color, point, 1)
+
+
+def draw_text(window):
+    font_size = 14
+    font = pygame.font.SysFont("Arial", font_size)
+    font_color = (177, 177, 177)
+
+    result = font.render("Calculated Pi Number: " + str(CALCULATED_PI), True, (255, 255, 255))
+    window.blit(result, (TARGET.point[0], TARGET.point[1] + TARGET.width + font_size * 2))
+
+    inside = font.render("Inside of the target: " + str(SHOTS_IN_CIRCLE), True, (70, 220, 70))
+    outside = font.render("Outside of the target: " + str(SHOTS_IN_RECT), True, (70, 70, 220))
+    window.blit(inside, (TARGET.point[0] + TARGET.width + font_size, TARGET.point[1] + font_size * 2))
+    window.blit(outside, (TARGET.point[0] + TARGET.width + font_size, TARGET.point[1] + font_size * 4))
+
+    project = font.render("Project's website: https://github.com/FlrQue/pinezka", True, font_color)
+    video_link = font.render("Inspired by: https://www.youtube.com/watch?v=aKyzxK7Wj0o", True, font_color)
+    video_title = font.render("\"Dwulatek vs komputer - kto lepiej wyznaczy liczbę pi?\" by Uwaga! Naukowy Bełkot", True, font_color)
+    window.blit(project, (font_size, font_size * 1 * 1.1))
+    window.blit(video_link, (font_size, font_size * 2 * 1.1))
+    window.blit(video_title, (font_size, font_size * 3 * 1.1))
+
+    license = font.render("Created by Daniel Wasiak | Licensed under the MIT license", True, font_color)
+    window.blit(license, (font_size, W_HEIGHT - font_size * 2 * 1.1))
 
 
 def random_shot():
-    rand_point = random.randrange(0, W_WIDTH), random.randrange(0, W_HEIGHT)
+    rand_point = random.randrange(TARGET.point[0] + 1, TARGET.point[0] + TARGET.width), \
+                 random.randrange(TARGET.point[1] + 1, TARGET.point[1] + TARGET.width)
 
     global SHOTS
     SHOTS += 1
@@ -121,6 +165,7 @@ class PiNezka:
         pygame.display.set_caption(WINDOW_TITLE)
 
     def init_app(self):
+        pygame.font.init()
         # for i in range(50000):
         #     random_shot()
 
@@ -140,6 +185,8 @@ class PiNezka:
         global TARGET
         TARGET.draw(self._window)
 
+        draw_text(self._window)
+
         pygame.display.update()
 
     def _pygame_event_handler(self) -> None:
@@ -151,11 +198,16 @@ class PiNezka:
                 # pos = pygame.mouse.get_pos()
                 # random_shot()
 
-                for i in range(5000):
-                    random_shot()
+                if event.button not in (1, 3):
+                    return
 
-                print(SHOTS, SHOTS_IN_RECT, SHOTS_IN_CIRCLE)
-                print("PI = " + str((SHOTS_IN_CIRCLE / (SHOTS_IN_RECT+SHOTS_IN_CIRCLE)) * 4))
+                if event.button == 3:
+                    global SHOT_POINTS
+                    SHOT_POINTS.clear()
+
+                for i in range(BATCH_SHOTS):
+                    random_shot()
+                    update_pi()
 
     def mainloop(self):
         while self._running:
