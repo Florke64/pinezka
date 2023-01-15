@@ -8,7 +8,7 @@ SCALE = 1.314
 W_WIDTH = 800
 W_HEIGHT = 600
 FPS_COUNT = 24
-WINDOW_TITLE = "PiNezka | Author: Wasiak Florke Daniel <wasiak.daniel@gmail.com>"
+WINDOW_TITLE = "PiNezka | Author: Florke64 <wasiak.daniel@gmail.com>"
 WINDOW_RESOLUTION = (W_WIDTH, W_HEIGHT)
 
 TARGET_CENTER = (int(W_WIDTH/2), int(W_HEIGHT/2))
@@ -122,14 +122,14 @@ def draw_text(window):
     window.blit(inside, (TARGET.point[0] + TARGET.width + font_size, TARGET.point[1] + font_size * 2))
     window.blit(outside, (TARGET.point[0] + TARGET.width + font_size, TARGET.point[1] + font_size * 4))
 
-    project = font.render("Project's website: https://github.com/FlrQue/pinezka", True, font_color)
-    video_link = font.render("Inspired by: https://www.youtube.com/watch?v=aKyzxK7Wj0o", True, font_color)
+    project = font.render("Project's website: https://github.com/Florke64/pinezka", True, font_color)
+    video_link = font.render("Inspired by: https://youtu.be/aKyzxK7Wj0o", True, font_color)
     video_title = font.render("\"Dwulatek vs komputer - kto lepiej wyznaczy liczbę pi?\" by Uwaga! Naukowy Bełkot", True, font_color)
     window.blit(project, (font_size, font_size * 1 * 1.1))
     window.blit(video_link, (font_size, font_size * 2 * 1.1))
     window.blit(video_title, (font_size, font_size * 3 * 1.1))
 
-    license = font.render("Created by Daniel Wasiak | Licensed under the MIT license", True, font_color)
+    license = font.render("Created by Florke64 | Licensed under the MIT license", True, font_color)
     window.blit(license, (font_size, W_HEIGHT - font_size * 2 * 1.1))
 
 
